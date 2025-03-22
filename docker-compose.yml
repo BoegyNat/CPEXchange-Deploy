@@ -1,0 +1,60 @@
+version: "3.8"
+services:
+  backend:
+    image: boegynat/project-backend:latest
+    ports:
+      - "5002:5002"
+    environment:
+      - DB_HOST=
+      - DB_USER=
+      - DB_PASSWORD=
+      - DB_NAME=
+      - DB_PORT=
+      - NODE_ENV=production
+      - ORIGIN_URL=http://localhost:3002,http://localhost:3000
+      - JWT_SECRET=
+      - API_URL=http://localhost:5002/
+      - PORT=5002
+    depends_on:
+      - db
+    networks:
+      - cpexchangefront_back
+      - cpexchangeback_db
+    volumes:
+      - file:/usr/src/app/app/file
+
+  frontend:
+    image: boegynat/project-frontend:latest
+    ports:
+      - "3002:3000"
+    environment:
+      - REACT_APP_URL=
+      - REACT_APP_API_URL=
+      - REACT_APP_SOCKET_URL=
+    depends_on:
+      - backend
+    networks:
+      - cpexchangefront_back
+
+  db:
+    image: mysql:8.0
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: boegy5882
+      MYSQL_DATABASE: cpexchange
+    ports:
+      - "3307:3306"
+    volumes:
+      - db_data:/var/lib/mysql
+    networks:
+      - cpexchangeback_db
+
+volumes:
+  db_data:
+  file:
+
+networks:
+  cpexchangefront_back:
+    driver: bridge
+  cpexchangeback_db:
+    driver: bridge
